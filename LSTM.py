@@ -29,7 +29,7 @@ def lstm_model(X,y):
     output=output[-1]
     prediction,loss=learn.models.linear_regression(output, y)
 
-    train_op = tf.contrib.layers.optimize_loss(loss, tf.contrib.framework.get_global_step(), optimizer="Adagrad", learning_rate=0.1)
+    train_op = tf.contrib.layers.optimize_loss(loss, tf.contrib.framework.get_global_step(), optimizer="Adagrad", learning_rate=0.0036)
     return prediction, loss, train_op
 regressor = learn.Estimator(model_fn=lstm_model)
 
@@ -51,24 +51,24 @@ for t in time:
 
 train_X, train_y = generate_data(width[:6274])
 
-test_X, test_y = generate_data(width[6273:])
-test_X2, test_y2 = generate_data(width[6274:])
+test_X, test_y = generate_data(width[6275:6292])
+test_X2, test_y2 = generate_data(width[6274:6291])
 
 regressor.fit(train_X, train_y, batch_size=BATCH_SIZE, steps=TRAINING_STEPS)
 
 predicted = [[pred] for pred in regressor.predict(test_X)]
 
-rmse=np.sqrt(((predicted[1:]-test_y2) ** 2).mean(axis=0))
-re=(np.abs(predicted[1:]-test_y2)).mean(axis=0)
+rmse=np.sqrt(((predicted-test_y2) ** 2).mean(axis=0))
+re=(np.abs(predicted-test_y2)).mean(axis=0)
 print ('Mean Square Error is: %f' % rmse[0])
 print ('relative error is : %f' %re)
-print(predicted[:])
-print(test_y2[:])
+print(predicted)
+print(test_y2)
 
 fig=plt.figure()
 label=['predicted','real']
 plt.plot(predicted,'g')
-plt.plot(test_y,'r')
+plt.plot(test_y2,'r')
 plt.legend(label,loc=0,ncol=2)
 #plt.legend([plot_predicted, plot_test], ['predicted', 'real_sin'])
 
