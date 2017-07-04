@@ -1,9 +1,13 @@
 import numpy as np
 import tensorflow as tf
 import matplotlib as mpl 
+from sklearn.externals import joblib
+import pickle
 mpl.use('Agg')
-from matplotlib import pyplot as plt 
+from matplotlib import pyplot as plt
+
 learn=tf.contrib.learn
+
 HIDDEN_SIZE=30
 NUM_LAYERS=2
 TIMESTEPS=10
@@ -35,6 +39,7 @@ def lstm_model(X,y):
     return prediction, loss, train_op
 
 regressor = learn.Estimator(model_fn=lstm_model)
+
 test_start=TRAINING_EXAMPLES*SAMPLE_GAP
 test_end=(TRAINING_EXAMPLES+TESTING_EXAMPLES) * SAMPLE_GAP
 train_X, train_y = generate_data(np.sin(np.linspace(0, test_start, TRAINING_EXAMPLES, dtype=np.float32)))
@@ -42,6 +47,8 @@ test_X, test_y = generate_data(np.sin(np.linspace(test_start, test_end, TESTING_
 
 regressor.fit(train_X, train_y, batch_size=BATCH_SIZE, steps=TRAINING_STEPS)
 
+
+    
 predicted = [[pred] for pred in regressor.predict(test_X)]
 
 rmse=np.sqrt(((predicted-test_y) ** 2).mean(axis=0))
